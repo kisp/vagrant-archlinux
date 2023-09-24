@@ -1,8 +1,8 @@
-init:
-	packer init .
-
 build:
 	packer build -var-file isovars.pkrvars.hcl mybox.pkr.hcl
+
+init:
+	packer init .
 
 list-boxes:
 	vagrant box list

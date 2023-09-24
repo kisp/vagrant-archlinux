@@ -12,3 +12,7 @@ add-box:
 
 remove-box:
 	vagrant box remove mypacker
+
+start-box:
+	vagrant up
+	vagrant ssh

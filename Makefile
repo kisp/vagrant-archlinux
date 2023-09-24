@@ -13,6 +13,9 @@ add-box:
 remove-box:
 	vagrant box remove mypacker
 
-start-box:
+start-vm:
 	vagrant up
 	vagrant ssh
+
+destroy-vm:
+	vagrant destroy -f

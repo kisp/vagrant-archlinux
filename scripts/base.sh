@@ -45,7 +45,7 @@ echo LANG=en_US.UTF-8 > /etc/locale.conf
 echo KEYMAP=en > /etc/vconsole.conf
 sed -i 's/# %wheel ALL=(ALL:ALL) N/%wheel ALL=(ALL:ALL) N/g' /etc/sudoers
 pacman -S --noconfirm dhcpcd grub linux openssh netctl virtualbox-guest-utils-nox
-pacman -S --noconfirm less vim
+pacman -S --noconfirm less vim man-db
 systemctl enable sshd vboxservice dhcpcd@enp0s3
 grub-install --target=i386-pc --recheck --debug /dev/sda
 sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=1/g' /etc/default/grub

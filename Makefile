@@ -8,7 +8,7 @@ list-boxes:
 	vagrant box list
 
 add-box:
-	vagrant box add mypacker archlinux-x64-202309.box --force
+	vagrant box add mypacker archlinux-x64-202310.box --force
 
 remove-box:
 	vagrant box remove mypacker

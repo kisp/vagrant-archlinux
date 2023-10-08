@@ -45,7 +45,7 @@ echo LANG=en_US.UTF-8 > /etc/locale.conf
 echo KEYMAP=en > /etc/vconsole.conf
 sed -i 's/# %wheel ALL=(ALL:ALL) N/%wheel ALL=(ALL:ALL) N/g' /etc/sudoers
 pacman -S --noconfirm dhcpcd grub linux openssh netctl openresolv virtualbox-guest-utils-nox
-pacman -S --noconfirm less vim man-db
+pacman -S --noconfirm less git vim man-db
 systemctl enable sshd vboxservice
 grub-install --target=i386-pc --recheck --debug /dev/sda
 sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=1/g' /etc/default/grub
@@ -57,6 +57,17 @@ pacman -Scc --noconfirm
 useradd -m vagrant
 echo vagrant:vagrant | chpasswd
 usermod -a -G adm,disk,wheel,log,vboxsf vagrant
+
+# yay
+cd /home/vagrant
+git clone https://aur.archlinux.org/yay-bin.git
+chown -R vagrant:vagrant yay-bin
+cd yay-bin
+su vagrant makepkg
+pacman -U --noconfirm yay-bin-*pkg.tar.zst
+cd ..
+rm -rf yay-bin
+
 exit
 EOF
 

@@ -40,7 +40,11 @@ build {
   sources = ["source.virtualbox-iso.archlinux"]
 
   provisioner "shell" {
-    scripts = ["scripts/base.sh", "scripts/vagrant.sh", "scripts/clean.sh"]
+    scripts = [
+      "scripts/base.sh",
+      "scripts/vagrant.sh",
+      "scripts/clean.sh"
+    ]
   }
 
   post-processor "vagrant" {

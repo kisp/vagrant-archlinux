@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-VERSION=1.0.1
+VERSION=1.0.3
 
 # Create a new version
 
@@ -38,7 +38,7 @@ upload_path=$(echo "$response" | jq -r .upload_path)
 curl --fail-with-body \
      --request PUT \
      "${upload_path}" \
-     --upload-file archlinux-x64-202310.box \
+     --upload-file archlinux-x64-*.box \
     | cat
 
 echo DONE

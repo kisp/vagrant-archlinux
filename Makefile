@@ -1,6 +1,9 @@
 build:
 	packer build -var-file isovars.pkrvars.hcl mybox.pkr.hcl
 
+clean:
+	rm -f archlinux-x64-*.box
+
 init:
 	packer init .
 

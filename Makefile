@@ -24,3 +24,6 @@ start-vm:
 
 destroy-vm:
 	vagrant destroy -f
+
+upload:
+	./upload.sh

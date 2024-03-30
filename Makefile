@@ -13,10 +13,10 @@ list-boxes:
 	vagrant box list
 
 add-box:
-	vagrant box add mypacker archlinux-x64-$(RELEASE_DATESTAMP).box --force
+	vagrant box add vagrant-archlinux-test archlinux-x64-$(RELEASE_DATESTAMP).box --force
 
 remove-box:
-	vagrant box remove mypacker
+	vagrant box remove vagrant-archlinux-test
 
 start-vm:
 	vagrant up

@@ -1,7 +1,7 @@
 RELEASE_DATESTAMP := $(shell date +'%Y%m')
 
 build:
-	packer build -var-file isovars.pkrvars.hcl mybox.pkr.hcl
+	packer build -var-file isovars.pkrvars.hcl archbox.pkr.hcl
 
 clean:
 	rm -f archlinux-x64-*.box

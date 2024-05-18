@@ -11,7 +11,7 @@ packer {
   }
 }
 
-variable "isochecksum" {
+variable "isochecksum_sha256" {
   type = string
 }
 
@@ -26,7 +26,7 @@ source "virtualbox-iso" "archlinux" {
   guest_additions_mode = "disable"
   guest_os_type        = "ArchLinux_64"
   headless             = true
-  iso_checksum         = "${var.isochecksum}"
+  iso_checksum         = "${var.isochecksum_sha256}"
   iso_url              = "${var.isourl}"
   memory               = 1024
   shutdown_command     = "echo '/sbin/halt -h -p' > shutdown.sh; echo 'vagrant'|sudo -S bash 'shutdown.sh'"

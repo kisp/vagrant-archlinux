@@ -48,7 +48,19 @@ pacman -S --noconfirm dhcpcd grub linux openssh netctl openresolv virtualbox-gue
 pacman -S --noconfirm less git vim man-db
 systemctl enable sshd vboxservice
 grub-install --target=i386-pc --recheck --debug /dev/sda
-sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=1/g' /etc/default/grub
+
+# Set timeout to 1
+sed -i -E 's/^GRUB_TIMEOUT=[0-9]+$/GRUB_TIMEOUT=1/' /etc/default/grub
+
+# Remove quiet option from GRUB_CMDLINE_LINUX_DEFAULT
+sed -i -E 's/^(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*)\s*quiet([^"]*")/\1\2/' /etc/default/grub
+
+# Add console=tty0 console=ttyS0 to GRUB_CMDLINE_LINUX
+sed -i -E 's/^GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0"/' /etc/default/grub
+
+# Uncomment GRUB_TERMINAL_OUTPUT
+sed -i -E 's/^#\s*(GRUB_TERMINAL_OUTPUT=console)/\1/' /etc/default/grub
+
 grub-mkconfig -o /boot/grub/grub.cfg
 cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/enp0s3
 sed -i 's/Interface=eth0/Interface=enp0s3/g' /etc/netctl/enp0s3

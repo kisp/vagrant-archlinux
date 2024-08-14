@@ -42,7 +42,7 @@ ln -s /usr/share/zoneinfo/UTC /etc/localtime
 sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
 locale-gen
 echo LANG=en_US.UTF-8 > /etc/locale.conf
-echo KEYMAP=en > /etc/vconsole.conf
+echo KEYMAP=us > /etc/vconsole.conf
 sed -i 's/# %wheel ALL=(ALL:ALL) N/%wheel ALL=(ALL:ALL) N/g' /etc/sudoers
 pacman -S --noconfirm dhcpcd grub linux openssh netctl openresolv virtualbox-guest-utils-nox
 pacman -S --noconfirm less git vim man-db

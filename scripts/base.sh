@@ -38,6 +38,11 @@ genfstab -p /mnt >> /mnt/etc/fstab
 # Enter in chroot and finish installation
 arch-chroot /mnt << EOF
 echo arch > /etc/hostname
+cat <<EOT > /etc/hosts
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   arch.local  arch
+EOT
 ln -s /usr/share/zoneinfo/UTC /etc/localtime
 sed -i 's/#en_US.UTF-8/en_US.UTF-8/g' /etc/locale.gen
 locale-gen

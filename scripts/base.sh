@@ -50,6 +50,7 @@ echo LANG=en_US.UTF-8 > /etc/locale.conf
 echo KEYMAP=us > /etc/vconsole.conf
 sed -i 's/# %wheel ALL=(ALL:ALL) N/%wheel ALL=(ALL:ALL) N/g' /etc/sudoers
 pacman -S --noconfirm dhcpcd grub linux openssh netctl openresolv virtualbox-guest-utils-nox
+pacman -S --noconfirm inetutils
 pacman -S --noconfirm less git vim man-db
 systemctl enable sshd vboxservice
 grub-install --target=i386-pc --recheck --debug /dev/sda

@@ -1,2 +1,2 @@
-isourl = "http://mirror.rackspace.com/archlinux/iso/2025.04.01/archlinux-2025.04.01-x86_64.iso"
-isochecksum_sha256 = "1155af9c142387c45eb6fbdbf32f5652fb514ce15a4d17a83e6056a996895026"
+isourl = "http://mirror.rackspace.com/archlinux/iso/2025.05.01/archlinux-2025.05.01-x86_64.iso"
+isochecksum_sha256 = "2008e6becc86d207272625c94a388d2ee3b14d6a24b401552d8105c4e82c96db"

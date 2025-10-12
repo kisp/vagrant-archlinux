@@ -1,4 +1,5 @@
 RELEASE_DATESTAMP := $(shell date +'%Y%m')
+BOX_NAME := vagrant-archlinux-test-$(RELEASE_DATESTAMP)
 
 build:
 	packer build -var-file isovars.pkrvars.hcl archbox.pkr.hcl
@@ -13,10 +14,10 @@ list-boxes:
 	vagrant box list
 
 add-box:
-	vagrant box add vagrant-archlinux-test archlinux-x64-$(RELEASE_DATESTAMP).box --force
+	vagrant box add $(BOX_NAME) archlinux-x64-$(RELEASE_DATESTAMP).box --force
 
 remove-box:
-	vagrant box remove vagrant-archlinux-test
+	vagrant box remove $(BOX_NAME)
 
 start-vm:
 	vagrant up

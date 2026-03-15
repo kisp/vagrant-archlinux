@@ -1,2 +1,2 @@
-isourl = "https://ftp.halifax.rwth-aachen.de/archlinux/iso/2026.02.01/archlinux-2026.02.01-x86_64.iso"
-isochecksum_sha256 = "c0ee0dab0a181c1d6e3d290a81ae9bc41c329ecaa00816ca7d62a685aeb8d972"
+isourl = "https://ftp.halifax.rwth-aachen.de/archlinux/iso/2026.03.01/archlinux-2026.03.01-x86_64.iso"
+isochecksum_sha256 = "569f7331bbcb882d130035324ab5feb1cd9807ccc9a49aa61102d40121518db6"

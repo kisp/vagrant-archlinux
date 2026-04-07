@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-VERSION=1.0.24
+VERSION=1.0.25
 
 # Create a new version
 

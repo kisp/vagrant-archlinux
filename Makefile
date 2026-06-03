@@ -19,7 +19,8 @@ clean-qemu:
 	rm -rf output-archlinux-qemu
 
 init:
-	packer init .
+	packer init archbox.pkr.hcl
+	packer init archbox-qemu.pkr.hcl
 
 list-boxes:
 	vagrant box list

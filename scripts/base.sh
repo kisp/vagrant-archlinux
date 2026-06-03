@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Build-target parameters. The defaults reproduce the original VirtualBox
+# build; the QEMU build overrides them via Packer's environment_vars.
+DISK="${DISK:-/dev/sda}"                                  # /dev/sda (vbox) or /dev/vda (qemu virtio)
+GUEST_PKG="${GUEST_PKG:-virtualbox-guest-utils-nox}"      # guest integration package
+GUEST_SERVICE="${GUEST_SERVICE:-vboxservice}"             # guest integration service to enable
+EXTRA_GROUPS="${EXTRA_GROUPS:-adm,disk,wheel,log,vboxsf}" # extra groups for the vagrant user
+NET_MANAGER="${NET_MANAGER:-netctl}"                      # netctl (vbox) or dhcpcd (qemu)
+NIC="${NIC:-enp0s3}"                                      # interface name (only used by netctl)
+PARTITION="${PARTITION:-}"                                # set non-empty to partition $DISK here (qemu)
+
 # Updating pacman keyring (uncomment if ISO has signature problems)
 #sed -i '/\[options\]/a SigLevel = Never' /etc/pacman.conf
 #pacman -Sy --noconfirm archlinux-keyring
@@ -8,21 +18,35 @@ pacman-key --init
 pacman-key --populate
 #pacman -Sy --noconfirm archlinux-keyring
 
+# Partition the disk. The VirtualBox build does this via the Packer
+# boot_command keystrokes before this script runs; the QEMU build does it
+# here (sfdisk over SSH is reliable, unlike fdisk typed over VNC).
+# Layout matches the boot_command: 512M boot, 2G swap, rest root.
+if [ -n "$PARTITION" ]; then
+  sfdisk "$DISK" <<SFDISK
+label: dos
+,512M,83
+,2G,82
+,,83
+SFDISK
+  udevadm settle
+fi
+
 # Create filesystems
-mkfs.ext4 /dev/sda1
-mkfs.ext4 /dev/sda3
-mkswap /dev/sda2
+mkfs.ext4 ${DISK}1
+mkfs.ext4 ${DISK}3
+mkswap ${DISK}2
 
 # Label filesystems
-e2label /dev/sda1 boot
-e2label /dev/sda3 root
-swaplabel -L swap /dev/sda2
+e2label ${DISK}1 boot
+e2label ${DISK}3 root
+swaplabel -L swap ${DISK}2
 
 # Do mounts and enable swap
-mount /dev/sda3 /mnt
+mount ${DISK}3 /mnt
 mkdir /mnt/boot
-mount /dev/sda1 /mnt/boot
-swapon /dev/sda2
+mount ${DISK}1 /mnt/boot
+swapon ${DISK}2
 
 # Search for best mirrors (uncomment if geomirror is failing)
 #echo "Ranking mirrors (may take a while) . . ."
@@ -49,11 +73,11 @@ locale-gen
 echo LANG=en_US.UTF-8 > /etc/locale.conf
 echo KEYMAP=us > /etc/vconsole.conf
 sed -i 's/# %wheel ALL=(ALL:ALL) N/%wheel ALL=(ALL:ALL) N/g' /etc/sudoers
-pacman -S --noconfirm dhcpcd grub linux openssh netctl openresolv virtualbox-guest-utils-nox
+pacman -S --noconfirm dhcpcd grub linux openssh netctl openresolv $GUEST_PKG
 pacman -S --noconfirm inetutils
 pacman -S --noconfirm less git vim man-db
-systemctl enable sshd vboxservice
-grub-install --target=i386-pc --recheck --debug /dev/sda
+systemctl enable sshd $GUEST_SERVICE
+grub-install --target=i386-pc --recheck --debug $DISK
 
 # Set timeout to 1
 sed -i -E 's/^GRUB_TIMEOUT=[0-9]+$/GRUB_TIMEOUT=1/' /etc/default/grub
@@ -68,13 +92,19 @@ sed -i -E 's/^GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="console=tty0 console=tty
 sed -i -E 's/^#\s*(GRUB_TERMINAL_OUTPUT=console)/\1/' /etc/default/grub
 
 grub-mkconfig -o /boot/grub/grub.cfg
-cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/enp0s3
-sed -i 's/Interface=eth0/Interface=enp0s3/g' /etc/netctl/enp0s3
-netctl enable enp0s3
+if [ "$NET_MANAGER" = netctl ]; then
+  # VirtualBox: configure DHCP on a fixed, predictable interface name
+  cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/$NIC
+  sed -i "s/Interface=eth0/Interface=$NIC/g" /etc/netctl/$NIC
+  netctl enable $NIC
+else
+  # QEMU: dhcpcd in master mode is robust to the virtio interface name
+  systemctl enable dhcpcd
+fi
 pacman -Scc --noconfirm
 useradd -m vagrant
 echo vagrant:vagrant | chpasswd
-usermod -a -G adm,disk,wheel,log,vboxsf vagrant
+usermod -a -G $EXTRA_GROUPS vagrant
 
 # yay
 cd /home/vagrant

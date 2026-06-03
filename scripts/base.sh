@@ -8,6 +8,7 @@ GUEST_SERVICE="${GUEST_SERVICE:-vboxservice}"             # guest integration se
 EXTRA_GROUPS="${EXTRA_GROUPS:-adm,disk,wheel,log,vboxsf}" # extra groups for the vagrant user
 NET_MANAGER="${NET_MANAGER:-netctl}"                      # netctl (vbox) or dhcpcd (qemu)
 NIC="${NIC:-enp0s3}"                                      # interface name (only used by netctl)
+PARTITION="${PARTITION:-}"                                # set non-empty to partition $DISK here (qemu)
 
 # Updating pacman keyring (uncomment if ISO has signature problems)
 #sed -i '/\[options\]/a SigLevel = Never' /etc/pacman.conf
@@ -16,6 +17,20 @@ NIC="${NIC:-enp0s3}"                                      # interface name (only
 pacman-key --init
 pacman-key --populate
 #pacman -Sy --noconfirm archlinux-keyring
+
+# Partition the disk. The VirtualBox build does this via the Packer
+# boot_command keystrokes before this script runs; the QEMU build does it
+# here (sfdisk over SSH is reliable, unlike fdisk typed over VNC).
+# Layout matches the boot_command: 512M boot, 2G swap, rest root.
+if [ -n "$PARTITION" ]; then
+  sfdisk "$DISK" <<SFDISK
+label: dos
+,512M,83
+,2G,82
+,,83
+SFDISK
+  udevadm settle
+fi
 
 # Create filesystems
 mkfs.ext4 ${DISK}1

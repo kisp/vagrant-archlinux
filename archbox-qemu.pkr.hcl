@@ -33,10 +33,12 @@ source "qemu" "archlinux" {
   ssh_port     = 22
   ssh_timeout  = "10000s"
 
-  # Same installer keystrokes as the VirtualBox build, but the virtio disk
-  # shows up as /dev/vda instead of /dev/sda.
+  # Unlike the VirtualBox build, partitioning is NOT done via keystrokes here
+  # (interactive fdisk typed over VNC is unreliable under QEMU). We only set
+  # the root password and start sshd; scripts/base.sh partitions the disk
+  # itself over SSH (PARTITION=yes below).
   boot_wait    = "10s"
-  boot_command = ["<enter><wait10><wait10><wait10>", "fdisk /dev/vda<enter>", "n<enter><enter><enter><enter>+512M<enter>", "n<enter><enter><enter><enter>+2G<enter>", "n<enter><enter><enter><enter><enter>", "t<enter>2<enter>82<enter>w<enter>", "echo root:toor | chpasswd<enter>", "systemctl start sshd<enter>"]
+  boot_command = ["<enter><wait10><wait10><wait10>", "echo root:toor | chpasswd<enter>", "systemctl start sshd<enter>"]
 
   shutdown_command = "echo '/sbin/halt -h -p' > shutdown.sh; echo 'vagrant'|sudo -S bash 'shutdown.sh'"
 
@@ -51,6 +53,7 @@ build {
     # Override the VirtualBox defaults baked into scripts/base.sh.
     environment_vars = [
       "DISK=/dev/vda",
+      "PARTITION=yes",
       "GUEST_PKG=qemu-guest-agent",
       "GUEST_SERVICE=qemu-guest-agent",
       "EXTRA_GROUPS=adm,disk,wheel,log",

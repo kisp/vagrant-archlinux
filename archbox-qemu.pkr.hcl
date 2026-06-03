@@ -37,8 +37,12 @@ source "qemu" "archlinux" {
   # (interactive fdisk typed over VNC is unreliable under QEMU). We only set
   # the root password and start sshd; scripts/base.sh partitions the disk
   # itself over SSH (PARTITION=yes below).
+  #
+  # The waits must be long enough for the live ISO to reach its autologin
+  # shell before these keys are typed, otherwise they are lost and sshd
+  # never comes up (Packer then hangs on "Waiting for SSH").
   boot_wait    = "10s"
-  boot_command = ["<enter><wait10><wait10><wait10>", "echo root:toor | chpasswd<enter>", "systemctl start sshd<enter>"]
+  boot_command = ["<enter>", "<wait10><wait10><wait10><wait10><wait10>", "echo root:toor | chpasswd<enter>", "<wait5>", "systemctl start sshd<enter>"]
 
   shutdown_command = "echo '/sbin/halt -h -p' > shutdown.sh; echo 'vagrant'|sudo -S bash 'shutdown.sh'"
 

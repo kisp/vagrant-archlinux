@@ -24,6 +24,11 @@ make run-qemu    # boots the newest image in this terminal (serial console)
 prompt right in your shell. Log in as `vagrant` / `vagrant` (passwordless sudo
 via the `wheel` group). Press `Ctrl-a x` to quit QEMU.
 
+To keep the built image pristine, `run-qemu.sh` boots a writable qcow2 *overlay*
+backed by it (`<image>.overlay.qcow2`); all your changes land in the overlay.
+Start fresh with `RESET=1 make run-qemu`, or boot the base directly with
+`NO_OVERLAY=1 make run-qemu`. `make clean-qemu` removes the image and overlays.
+
 The image is built from the same provisioning scripts as the box; the QEMU build
 (`archbox-qemu.pkr.hcl`) just overrides a few `scripts/base.sh` parameters
 (virtio `/dev/vda`, `qemu-guest-agent`, `dhcpcd`) via Packer environment

@@ -17,6 +17,7 @@ clean:
 
 clean-qemu:
 	rm -rf output-archlinux-qemu
+	rm -f *.overlay.qcow2
 
 init:
 	packer init archbox.pkr.hcl

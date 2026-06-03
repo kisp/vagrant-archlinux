@@ -19,6 +19,13 @@ variable "isourl" {
   type = string
 }
 
+# Optional build-time features (all off by default). Enable e.g. with
+# `make build NIX=1` or `PKR_VAR_enable_nix=true packer build ...`.
+variable "enable_nix" {
+  type    = bool
+  default = false
+}
+
 source "virtualbox-iso" "archlinux" {
   boot_command         = ["<enter><wait10><wait10><wait10>", "fdisk /dev/sda<enter>", "n<enter><enter><enter><enter>+512M<enter>", "n<enter><enter><enter><enter>+2G<enter>", "n<enter><enter><enter><enter><enter>", "t<enter>2<enter>82<enter>w<enter>", "echo root:toor | chpasswd<enter>", "systemctl start sshd<enter>"]
   boot_wait            = "10s"
@@ -40,8 +47,12 @@ build {
   sources = ["source.virtualbox-iso.archlinux"]
 
   provisioner "shell" {
+    environment_vars = [
+      "ENABLE_NIX=${var.enable_nix ? "1" : ""}",
+    ]
     scripts = [
       "scripts/base.sh",
+      "scripts/features.sh",
       "scripts/vagrant.sh",
       "scripts/clean.sh"
     ]

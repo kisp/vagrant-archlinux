@@ -1,6 +1,13 @@
 RELEASE_DATESTAMP := $(shell date +'%Y%m')
 BOX_NAME := vagrant-archlinux-test-$(RELEASE_DATESTAMP)
 
+# Optional build-time features. Pass NIX=1 to either build target to install
+# and enable Nix (with flakes) in the image, e.g. `make build-qemu NIX=1`.
+# This just maps to the Packer variable enable_nix.
+ifdef NIX
+export PKR_VAR_enable_nix := true
+endif
+
 build:
 	packer build -var-file isovars.pkrvars.hcl archbox.pkr.hcl
 

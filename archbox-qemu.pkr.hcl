@@ -21,7 +21,7 @@ source "qemu" "archlinux" {
 
   accelerator    = "kvm"
   headless       = true
-  disk_size      = "51200"
+  disk_size      = "51200M"
   format         = "qcow2"
   disk_interface = "virtio"
   net_device     = "virtio-net"

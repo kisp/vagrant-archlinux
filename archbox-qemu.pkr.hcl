@@ -15,6 +15,13 @@ variable "isourl" {
   type = string
 }
 
+# Optional build-time features (all off by default). Enable e.g. with
+# `make build-qemu NIX=1` or `PKR_VAR_enable_nix=true packer build ...`.
+variable "enable_nix" {
+  type    = bool
+  default = false
+}
+
 source "qemu" "archlinux" {
   iso_url      = var.isourl
   iso_checksum = "sha256:${var.isochecksum_sha256}"
@@ -62,9 +69,11 @@ build {
       "GUEST_SERVICE=qemu-guest-agent",
       "EXTRA_GROUPS=adm,disk,wheel,log",
       "NET_MANAGER=dhcpcd",
+      "ENABLE_NIX=${var.enable_nix ? "1" : ""}",
     ]
     scripts = [
       "scripts/base.sh",
+      "scripts/features.sh",
       "scripts/vagrant.sh",
       "scripts/clean.sh"
     ]

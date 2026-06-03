@@ -33,3 +33,21 @@ The image is built from the same provisioning scripts as the box; the QEMU build
 (`archbox-qemu.pkr.hcl`) just overrides a few `scripts/base.sh` parameters
 (virtio `/dev/vda`, `qemu-guest-agent`, `dhcpcd`) via Packer environment
 variables.
+
+## Optional build-time features
+
+Both builds support optional features that are **off by default** and can be
+switched on at build time. They're implemented in `scripts/features.sh` and
+exposed as Packer `enable_<feature>` variables.
+
+- **Nix** — installs the `nix` package, enables the multi-user daemon, turns on
+  flakes (`experimental-features = nix-command flakes`), and adds the `vagrant`
+  user to the `nix-users` group:
+
+  ```sh
+  make build-qemu NIX=1        # or: make build NIX=1
+  # equivalently: PKR_VAR_enable_nix=true packer build ... <template>
+  ```
+
+Adding more features (e.g. `sbcl` + quicklisp) follows the same pattern; see the
+header comment in `scripts/features.sh`.

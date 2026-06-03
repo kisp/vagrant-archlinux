@@ -1,3 +1,5 @@
 /*.box
+/*.qcow2
 /output-archlinux/
+/output-archlinux-qemu/
 .vagrant

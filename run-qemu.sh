@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Boot a built Arch Linux qcow2 image in the current terminal.
 #

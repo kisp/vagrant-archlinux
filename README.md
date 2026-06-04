@@ -1,6 +1,33 @@
 # vagrant-archlinux
 Arch Linux x86_64 base box
 
+## Build environment (Nix)
+
+A `flake.nix` provides all the build tooling (Packer, QEMU, jq, make) pinned via
+Nix, so you don't have to install anything system-wide:
+
+```sh
+nix develop          # drops you in a shell with packer + qemu on PATH
+make init
+make build-qemu      # or: make build
+```
+
+Convenience runners are also exposed (run from the repo root):
+
+```sh
+nix run .#build-qemu
+nix run .#run-qemu
+nix run .#build
+```
+
+What Nix pins here is the **tooling**, not the produced image. The image build
+still boots a VM and `pacstrap`s the *latest* Arch packages from mirrors at build
+time, so it needs `/dev/kvm` + network and is **not** a hermetic/bit-reproducible
+Nix derivation — that's why this is a dev shell rather than a `nix build`. Also:
+`make init` still fetches Packer plugins over the network, and the VirtualBox
+build expects your **system** VirtualBox (running VirtualBox from Nix on a
+non-NixOS host needs matching kernel modules and is not handled here).
+
 ## Vagrant Cloud
 
 This box is available at

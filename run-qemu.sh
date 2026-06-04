@@ -25,7 +25,11 @@
 #   MEM=2048       guest memory in MB (default 8192)
 #   CPUS=2         number of virtual CPUs (default 4)
 #   GUI=1          open a graphical QEMU window (gtk) and keep serial on stdout;
-#                  use this for X11/StumpWM testing
+#                  use this for X11/StumpWM testing (requires display on the host)
+#   VNC=1          expose the guest display via QEMU's built-in VNC server on
+#                  port 5901 and keep serial on stdout; connect remotely with:
+#                    ssh -L 5901:localhost:5901 <host>
+#                  then point any VNC client at localhost:5901
 
 set -euo pipefail
 
@@ -73,6 +77,13 @@ fi
 
 if [ -n "${GUI:-}" ]; then
   DISPLAY_ARGS=(-display gtk -serial stdio)
+elif [ -n "${VNC:-}" ]; then
+  VNC_DISPLAY="${VNC_DISPLAY:-1}"
+  VNC_PORT=$((5900 + VNC_DISPLAY))
+  echo "VNC listening on port ${VNC_PORT} (display :${VNC_DISPLAY})" >&2
+  echo "  Tunnel:  ssh -L ${VNC_PORT}:localhost:${VNC_PORT} $(hostname)" >&2
+  echo "  Connect: vnc://localhost:${VNC_PORT}" >&2
+  DISPLAY_ARGS=(-display vnc=:${VNC_DISPLAY} -serial stdio)
 else
   echo "(Ctrl-a x to quit)" >&2
   DISPLAY_ARGS=(-nographic)

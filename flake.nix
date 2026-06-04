@@ -39,9 +39,15 @@
           SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
 
           shellHook = ''
+            # First line only via `awk 'NR==1'`, NOT `head -n1`. `packer version`
+            # prints a second line (the "out of date" notice); `head -n1` closes
+            # the pipe after line 1, so packer is killed by SIGPIPE mid-write and
+            # never restores the terminal it had switched to raw mode -- which
+            # silently leaves `nix develop` with broken echo / line editing. `awk`
+            # reads to EOF, so packer (and qemu) exit cleanly and restore the tty.
             echo "vagrant-archlinux dev shell (build deps from Nix)"
-            echo "  packer : $(packer version 2>/dev/null | head -n1)"
-            echo "  qemu   : $(qemu-system-x86_64 --version 2>/dev/null | head -n1)"
+            echo "  packer : $(packer version 2>/dev/null | awk 'NR==1')"
+            echo "  qemu   : $(qemu-system-x86_64 --version 2>/dev/null | awk 'NR==1')"
             echo
             echo "  make init && make build         # VirtualBox/Vagrant box (uses system VirtualBox)"
             echo "  make init && make build-qemu    # QEMU qcow2 image"

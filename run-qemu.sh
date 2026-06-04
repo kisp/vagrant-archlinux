@@ -22,14 +22,16 @@
 #   OVERLAY=path   where to keep the writable overlay (default: ./<base>.overlay.qcow2)
 #   RESET=1        discard any existing overlay and start from a fresh one
 #   NO_OVERLAY=1   boot the base image directly (writes persist into it)
-#   MEM=2048       guest memory in MB (default 1024)
+#   MEM=2048       guest memory in MB (default 8192)
+#   CPUS=2         number of virtual CPUs (default 4)
 #   GUI=1          open a graphical QEMU window (gtk) and keep serial on stdout;
 #                  use this for X11/StumpWM testing
 
 set -euo pipefail
 
 BASE="${1:-}"
-MEM="${MEM:-1024}"
+MEM="${MEM:-8192}"
+CPUS="${CPUS:-4}"
 
 if [ -z "$BASE" ]; then
   BASE=$(ls -t output-archlinux-qemu/*.qcow2 2>/dev/null | head -n1 || true)
@@ -79,6 +81,7 @@ fi
 exec qemu-system-x86_64 \
   "${ACCEL[@]}" \
   -m "$MEM" \
+  -smp "$CPUS" \
   -drive file="$DISK",format=qcow2,if=virtio \
   -nic user,model=virtio,hostfwd=tcp::2222-:22 \
   "${DISPLAY_ARGS[@]}"

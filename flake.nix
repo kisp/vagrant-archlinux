@@ -31,7 +31,12 @@
     {
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
-          packages = toolingFor pkgs;
+          packages = toolingFor pkgs ++ [ pkgs.cacert ];
+
+          # Make TLS work even in a fully pure shell (`nix develop -i`), where
+          # the ambient SSL_CERT_FILE would otherwise be cleared and the
+          # host-side HTTPS downloads (ISO, packer init, curl) would fail.
+          SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
 
           shellHook = ''
             echo "vagrant-archlinux dev shell (build deps from Nix)"
@@ -57,7 +62,10 @@
             program = "${pkgs.writeShellApplication {
               inherit name;
               runtimeInputs = toolingFor pkgs;
-              text = ''exec make ${target} "$@"'';
+              text = ''
+                export SSL_CERT_FILE="${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+                exec make ${target} "$@"
+              '';
             }}/bin/${name}";
           };
         in

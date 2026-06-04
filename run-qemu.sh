@@ -23,6 +23,8 @@
 #   RESET=1        discard any existing overlay and start from a fresh one
 #   NO_OVERLAY=1   boot the base image directly (writes persist into it)
 #   MEM=2048       guest memory in MB (default 1024)
+#   GUI=1          open a graphical QEMU window (gtk) and keep serial on stdout;
+#                  use this for X11/StumpWM testing
 
 set -euo pipefail
 
@@ -67,10 +69,16 @@ else
   echo "Note: /dev/kvm not available, falling back to slow TCG emulation." >&2
 fi
 
-echo "(Ctrl-a x to quit)" >&2
+if [ -n "${GUI:-}" ]; then
+  DISPLAY_ARGS=(-display gtk -serial stdio)
+else
+  echo "(Ctrl-a x to quit)" >&2
+  DISPLAY_ARGS=(-nographic)
+fi
+
 exec qemu-system-x86_64 \
   "${ACCEL[@]}" \
   -m "$MEM" \
   -drive file="$DISK",format=qcow2,if=virtio \
-  -nic user,model=virtio \
-  -nographic
+  -nic user,model=virtio,hostfwd=tcp::2222-:22 \
+  "${DISPLAY_ARGS[@]}"

@@ -38,6 +38,15 @@
           # host-side HTTPS downloads (ISO, packer init, curl) would fail.
           SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
 
+          # Give the Nix-provided bash/glibc a working UTF-8 locale. On a
+          # non-NixOS host, nixpkgs glibc can't resolve the system locale, so
+          # it falls back to C (ASCII) and readline byte-counts multibyte
+          # prompt glyphs -- the cursor math breaks and typed input appears to
+          # vanish (e.g. with a UTF-8 git prompt). C.UTF-8 is built into glibc
+          # and needs no locale archive, so it works everywhere.
+          LANG = "C.UTF-8";
+          LC_ALL = "C.UTF-8";
+
           shellHook = ''
             echo "vagrant-archlinux dev shell (build deps from Nix)"
             echo "  packer : $(packer version 2>/dev/null | head -n1)"

@@ -17,9 +17,10 @@
 # Usage:
 #   ./run-qemu.sh [base-image.qcow2]
 #
-# With no argument it uses the newest image in output-archlinux-qemu/ as the
-# base. Environment variables:
-#   OVERLAY=path   where to keep the writable overlay (default: ./<base>.overlay.qcow2)
+# With no argument it uses the newest base image in images/ (overlays, which
+# live in the same directory, are skipped). Environment variables:
+#   IMAGES_DIR=dir directory holding the qcow2 images (default: images)
+#   OVERLAY=path   where to keep the writable overlay (default: images/<base>.overlay.qcow2)
 #   RESET=1        discard any existing overlay and start from a fresh one
 #   NO_OVERLAY=1   boot the base image directly (writes persist into it)
 #   MEM=2048       guest memory in MB (default 8192)
@@ -36,9 +37,11 @@ set -euo pipefail
 BASE="${1:-}"
 MEM="${MEM:-8192}"
 CPUS="${CPUS:-4}"
+IMAGES_DIR="${IMAGES_DIR:-images}"
 
 if [ -z "$BASE" ]; then
-  BASE=$(ls -t output-archlinux-qemu/*.qcow2 2>/dev/null | head -n1 || true)
+  # Newest base image in IMAGES_DIR, skipping overlays (which also live here).
+  BASE=$(ls -t "$IMAGES_DIR"/*.qcow2 2>/dev/null | grep -v '\.overlay\.qcow2$' | head -n1 || true)
 fi
 
 if [ -z "$BASE" ] || [ ! -f "$BASE" ]; then
@@ -51,8 +54,10 @@ if [ -n "${NO_OVERLAY:-}" ]; then
   echo "Booting base image directly (writes persist): $DISK" >&2
 else
   # Keep the built base image pristine; boot a writable overlay backed by it.
+  # The overlay sits next to its base (in IMAGES_DIR), so the images directory
+  # holds only qcow2 files.
   BASE_ABS=$(realpath "$BASE")
-  OVERLAY="${OVERLAY:-$(basename "${BASE%.qcow2}").overlay.qcow2}"
+  OVERLAY="${OVERLAY:-${BASE%.qcow2}.overlay.qcow2}"
 
   if [ -n "${RESET:-}" ]; then
     rm -f "$OVERLAY"

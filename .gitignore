@@ -2,6 +2,8 @@
 /*.qcow2
 /output-archlinux/
 /output-archlinux-qemu/
+# All qcow2 images live here; ignore them but keep the dir's CACHEDIR.TAG.
+/images/*.qcow2
 .vagrant
 /result
 /result-*

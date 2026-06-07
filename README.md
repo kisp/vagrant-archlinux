@@ -43,7 +43,7 @@ image and run it directly in your terminal — no Vagrant, no libvirt, no GUI.
 
 ```sh
 make init        # once, to install the qemu Packer plugin
-make build-qemu  # produces output-archlinux-qemu/archlinux-x64-YYYYMM.qcow2
+make build-qemu  # produces images/archlinux-x64-YYYYMM.qcow2
 make run-qemu    # boots the newest image in this terminal (serial console)
 ```
 
@@ -52,9 +52,15 @@ prompt right in your shell. Log in as `vagrant` / `vagrant` (passwordless sudo
 via the `wheel` group). Press `Ctrl-a x` to quit QEMU.
 
 To keep the built image pristine, `run-qemu.sh` boots a writable qcow2 *overlay*
-backed by it (`<image>.overlay.qcow2`); all your changes land in the overlay.
-Start fresh with `RESET=1 make run-qemu`, or boot the base directly with
-`NO_OVERLAY=1 make run-qemu`. `make clean-qemu` removes the image and overlays.
+backed by it (`images/<image>.overlay.qcow2`); all your changes land in the
+overlay. Start fresh with `RESET=1 make run-qemu`, or boot the base directly
+with `NO_OVERLAY=1 make run-qemu`. `make clean-qemu` removes the images
+(keeping the `CACHEDIR.TAG`).
+
+All qcow2 images — the base, overlays, and any saved snapshots — live together
+in `images/`, which carries a [`CACHEDIR.TAG`](https://bford.info/cachedir/) so
+backup tools (`restic --exclude-caches`, `borg --exclude-caches`,
+`tar --exclude-caches`) skip these large, regenerable files.
 
 The image is built from the same provisioning scripts as the box; the QEMU build
 (`archbox-qemu.pkr.hcl`) just overrides a few `scripts/base.sh` parameters
